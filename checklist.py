@@ -12,35 +12,38 @@ connection.commit()
 
 
 # Takes mode
-task = ""
-mode = input("Do you want to create a task (1) or finish a task (2) or see which tasks are pending (3): ")
+mode = input("Do you want to make a new task (1) or finish a task (2) or view your tasks (3): ")
 if mode == "1":
-    task = input("Enter your task: ")
-    c.execute("INSERT INTO list VALUES ({})".format('{}'.format(task)))
+    mode = input("Enter the task: ")
+    c.execute("INSERT INTO list VALUES ('{}')".format(mode))
     connection.commit()
 
-    c.execute("SELECT rowid, * FROM list WHERE task={}".format(task))
+    c.execute("SELECT rowid, * FROM list WHERE task='{}'".format(mode))
+    lst = c.fetchall()
+    connection.commit()
+    print("Task is added. The number for your task is: {}.\nNote: The number value has changed for each task".format(lst[0][0]))
+elif mode == "2":
+    mode = input("Please choose a way to delete. Through number(1) or through the task(2): ")
+    if mode == "1":
+        mode = input("Enter the number of the task: ")
+        c.execute("DELETE FROM list WHERE rowid={}".format(int(mode)))
+        connection.commit()
+
+        print("Phew! The task is over!")
+    else:
+        mode = input("Enter the task: ")
+        c.execute("DELETE FROM list WHERE task='{}'".format(mode))
+        connection.commit()
+
+        print("Phew! The task is over!")
+else:
+    c.execute("SELECT rowid, * FROM list")
     lst = c.fetchall()
     connection.commit()
 
-    print("Task is made! The number of your task is {}. I hope you aren't having a hard day!".format(lst[0][1]))
-elif mode == "2":
-    task = input("Are you choosing the number system(1) or the whole sentence(2): ")
-    if task == "1":
-        number = input("Enter your number: ")
-        query = "DELETE FROM list WHERE id={}".format(number)
-        c.execute(query)
-        connection.commit()
-        print("Successfully removed the task. You are doing good. Note, the other tasks numbers have changed. Please run the programme again to view the numbers")
+    for i in lst:
+        print("Number: {}    Task: {}".format(i[0], i[1]))
 
-    else:
-        sentence = input("Please enter your sentence: ")
-        c.execute("DELTE FROM list WHERE task={}".format('{}'.format(sentence)))
-        connection.commit()
-        print("Successfully removed the task. You are doing good. Note, the other tasks numbers have changed. Please run the programme again to view the numbers")
-else:
-    c.execute("SELECT rowid, * FROM list")
-    for i in c.fetchall():
-        print(i)
+
 
 connection.close()
